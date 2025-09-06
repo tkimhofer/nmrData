@@ -1,100 +1,123 @@
 ---
 title: "nmrdata: Example 1D Proton NMR Data"
 author: "Torben Kimhofer"
-date: "`r Sys.Date()`"
-output: BiocStyle::html_document
+date: "`r BiocStyle::doc_date()`"
+package: nmrdata
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to the nmrdata package}
+  %\VignetteIndexEntry{nmrdata: Example 1D Proton NMR Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
 ---
 
-# Introduction
-
-The **nmrdata** package provides example 1D proton NMR spectra of murine 
-urine samples collected before and after Roux-en-Y gastric bypass.
-A sham surgery group is also included as a negative control [@li2011gut].
-
-In addition to the processed dataset (`bariatric`), the package also contains a 
-minimal set  of 21 raw Bruker NMR experiment folders, located 
-under `inst/extdata/`.  These files can be accessed using the `system.file()` 
-function, e.g.:
-
-```{r}
-# Bruker Topspin-processed spectral data for experiment folder 1
-raw_path <- system.file("extdata", "1/pdata/1", package = "nmrdata")
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval=TRUE, message = FALSE, warning = FALSE)
 ```
 
-Both, processed data and raw experiment files are primarily intended for 
-demonstrating functionality of the  companion software package `metabom8`.
+# Overview
 
-# Dataset description
+The **nmrdata** package provides example one-dimensional (^1H) NMR spectra of murine
+urine samples collected before and after Roux-en-Y gastric bypass. A sham-surgery group
+is included as a negative control [@li2011gut].
 
-- One-dimensional proton (\(^1\)H) NMR spectra  
-- 67 urine samples (murine model)  
-- Acquired on a Bruker Avance III 600 MHz spectrometer  
-- Preprocessed with Probabilistic Quotient Normalization (PQN)  
+The package ships:
 
-The dataset is provided as an R list with three elements:
+- a **processed dataset** (R list) for quick examples;
+- a minimal set of **raw Bruker NMR experiment folders** for I/O demonstrations.
 
-- `X.pqn`: Matrix of pre-processed spectra  
-- `ppm`: Chemical shift vector (ppm)  
-- `an`: Sample annotation data (e.g., class membership)
-- `meta`: Acquisition and processing status parameters (Topspin), 
-  prefixed with `a` and `p`, respectively
+These data are intended for teaching and for demonstrating the companion package
+`metabom8`.
 
-# Usage
+```{r show-metadata}
+meta_path <- system.file("extdata", "metadata.csv", package = "nmrdata")
+if (file.exists(meta_path)) {
+  meta <- utils::read.csv(meta_path)
+  head(meta[c("Title","RDataPath")])
+}
+```
 
-```{r, eval=FALSE}
-# TODO: Once ExpHub is assigned, rm eval=F in code chunk pars
+# Dataset summary
+
+- Instrument: Bruker Avance III 600 MHz  
+- Samples: 67 rat urine specimens  
+- Processing: Baseline corrected, res. water signal excised, dilution normalised (probabilistic quotient normalisation)
+- Provided as an R list with:
+  - `X.pqn`: matrix of PQN-processed spectra
+  - `ppm`: chemical shift axis (ppm)
+  - `an`: sample annotation (e.g., class membership)
+  - `meta`: acquisition/processing parameters (TopSpin; `a*`, `p*`)
+
+# Installation
+
+```{r, install-lib}
+# Install from Bioconductor
+# if (!require("BiocManager")) install.packages("BiocManager")
+# BiocManager::install("nmrdata")
+```
+
+
+# Using the processed dataset (`.RData`)
+
+> Note: During review the data are hosted on Zenodo; code below is **not** executed
+> on Bioconductor’s build machines.
+
+```{r load-processed, eval=FALSE}
 library(nmrdata)
 
-# load pre-processed data set
-bariatric <- BariatricData()
+# load pre-processed data (returns a named list)
+bariatric <- nmrdata:::loadBariatric(as = "list", quiet = TRUE)
 
-# inspect structure
-str(bariatric)
+str(bariatric, max.level = 1)
 
-X.bariatric <- bariatric$X.pqn
-ppm.bariatric <- bariatric$ppm
-
-# plot first spectrum
-plot(ppm.bariatric, X.bariatric[1,], type = "l",
+# visualise the first NMR spectrum
+plot(bariatric$ppm, bariatric$X.pqn[1, ], type = "l",
      xlab = "Chemical shift (ppm)", ylab = "Intensity")
-
 ```
 
+# Using the raw Bruker experiments (folder dataset)
 
-```{r, eval = requireNamespace("metabom8", quietly = TRUE), eval=FALSE}
-library(metabom8)
-library(ExperimentHub)
+```{r raw-dir, eval=FALSE}
+# download once, unpack once; returns the directory path
+exp_dir <- nmrdata:::getRawExpDir(quiet = TRUE)
 
-# TODO: Replace EHxxxx once assigned, rm eval=F in code chunk pars
-raw_dir <- ExperimentHub()[["EHxxxx"]]  
-list.files(raw_dir)
-
-# import Bruker experiment files
-read1d_proc(raw_dir, exp_type=list(pulprog='noesypr1d'))
-
-# plot spectrum
-spec(X[1,], ppm)
-
-# For further examples and advanced workflows, see the metabom8 package.
+# show top-level contents
+list.files(exp_dir)
 ```
 
+If you have `metabom8` installed, you can import/process the raw experiments:
 
-# Package Version
+```{r metabom8, eval=TRUE}
+# library(metabom8)
+# 
+# # import Bruker 1D NMR spectra
+# res <- read1d_proc(exp_dir, exp_type = list(pulprog = "noesypr1d"))
+# 
+# # plot first spectrum
+# spec(res$X[1, ], res$ppm)
+```
+
+# Caching and reproducibility
+
+Data are cached under a per-user directory so repeated calls don’t re-download:
+
+```{r cache-info, eval=FALSE}
+# where the archive and unpacked folder live
+dir <- getRawExpDir(quiet = TRUE)
+print(dir)
+```
+
+# Package version
+
 ```{r}
 packageVersion("nmrdata")
 ```
 
-
-
-# Session Info
+# Session info
 
 ```{r}
 sessionInfo()
 ```
-
-

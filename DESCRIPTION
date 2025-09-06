@@ -1,6 +1,6 @@
 Package: nmrdata
 Type: Package
-Title: Example 1D NMR Data for Metabolic Profiling
+Title: Example 1d NMR Data for Metabolic Profiling
 Version: 0.99.0
 Authors@R: 
     person(given = "Torben",
@@ -8,22 +8,21 @@ Authors@R:
            role = c("aut", "cre"),
            email = "tkimhofer@gmail.com",
            comment = c(ORCID = "0000-0001-7158-9930"))
-Description: provides example one-dimensional proton NMR spectra of murine urine 
+Description: Provides example one-dimensional proton NMR spectra of murine urine 
     samples collected before and after bariatric or sham surgery (Roux-en-Y gastric bypass). 
     The data are adapted from Jia V Li et al. (2011), "Metabolic surgery profoundly 
     influences gut microbial-host metabolic cross-talk", Gut, 60(9), 1214–1223. 
-    doi:10.1136/gut.2010.234708. This package serves as example data for 
+    <doi:10.1136/gut.2010.234708>. This package serves as example data for 
     metabolomics analysis and teaching purposes.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.3.2
 Imports:
-  ExperimentHub
+  ExperimentHub,
 Suggests: 
     BiocStyle,
     knitr,
-    metabom8,
     rmarkdown
 VignetteBuilder: knitr
 biocViews: ExperimentHub, ExperimentData
