@@ -2,8 +2,6 @@ library(metabom8)
 
 ### reading and processing NMR experiments
 exp_dir ='/Users/tk/rproj/rygb_selected/'
-exp_dir = 'Users/tk/Library/Caches/org.R-project.R/R/nmrdata/bruker_exp'
-r
 
 read1d_proc(exp_dir, exp_type = list(PULPROG='noesypr1d'))
 
