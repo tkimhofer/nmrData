@@ -17,7 +17,7 @@ Description: Provides example one-dimensional proton NMR spectra of murine urine
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
   ExperimentHub,
 Suggests: 

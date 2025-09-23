@@ -32,3 +32,5 @@ testthat.Rout*
 *.Rproj
 /doc/
 /Meta/
+
+vignettes/*.R

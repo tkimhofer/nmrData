@@ -2,46 +2,49 @@
 % Please edit documentation in R/getRawExpFiles.R
 \name{getRawExpDir}
 \alias{getRawExpDir}
-\title{Get raw NMR experiment directory (folder name derived from tar.gz)}
+\title{Unpack and return path to raw NMR experiment directory}
 \usage{
-getRawExpDir(
-  cache_dir = NULL,
-  quiet = FALSE,
-  redownload = FALSE,
-  reuntar = FALSE
-)
+getRawExpDir(quiet = FALSE, reuntar = FALSE)
 }
 \arguments{
-\item{cache_dir}{Optional cache directory (default:
-`tools::R_user_dir("nmrdata", "cache")`), used only for the Zenodo path.}
+\item{quiet}{Logical; suppress progress messages (default `FALSE`).}
 
-\item{quiet}{Logical; suppress messages (default `FALSE`).}
-
-\item{redownload}{Logical; force re-download of the tar.gz (default `FALSE`).}
-
-\item{reuntar}{Logical; force re-unpack even if an unpack exists (default `FALSE`).}
+\item{reuntar}{Logical; force re-extraction even if the directory already
+exists and is populated (default `FALSE`).}
 }
 \value{
-Character scalar: normalized path to the unpacked dataset directory
-  located at `file.path(dirname(tar_path), <derived-root>)`.
+A character scalar: normalized absolute path to the unpacked dataset
+  directory inside the local ExperimentHub cache.
 }
 \description{
-During development this downloads the archive from Zenodo into a persistent
-per-user cache and unpacks it **beside the tarball** (i.e., into
-`file.path(dirname(tar_path), <top-level-from-tar>)`). The top-level directory
-name is detected from the archive contents; if the archive does not contain a
-single top-level directory, a folder named after the tarball (without the
-extension) is created and used as the root. After ExperimentHub onboarding,
-flip the internal `USE_HUB` flag and set `EH_ID_TAR` to prefer Hub.
+Retrieves the raw NMR experiment archive (tar.gz) from ExperimentHub
+and ensures it is unpacked once into a cache directory. If the unpacked
+directory already exists and contains files, it is reused; otherwise the
+tarball is extracted. Optionally, an existing unpack can be forced to be
+replaced.
 }
 \details{
-The function is idempotent: it downloads and unpacks only once unless you set
-`redownload = TRUE` and/or `reuntar = TRUE`.
+This helper is idempotent: repeated calls return the same normalized path
+without re-downloading or re-unpacking, unless explicitly instructed.
+
+
+- The function always uses the same internal ExperimentHub ID
+  (`EH9906` by default in this package).
+- The tarball is retrieved via [ExperimentHub::ExperimentHub()].
+- The directory is created next to the cached tarball inside the EH cache.
+- If the archive contains exactly one top-level folder, that name is reused.
+  Otherwise a default folder name (`"nmrdata"`) is created.
 }
 \examples{
 \dontrun{
 exp_dir <- getRawExpDir()
-list.files(exp_dir, recursive = TRUE)[1:10]
+list.files(exp_dir, recursive = TRUE)[1:5]
+
+# Force re-unpack if you think the folder is corrupted
+exp_dir <- getRawExpDir(reuntar = TRUE)
 }
+
 }
-\keyword{internal}
+\seealso{
+[ExperimentHub::ExperimentHub()], [utils::untar()]
+}
