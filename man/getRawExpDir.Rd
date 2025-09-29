@@ -4,17 +4,20 @@
 \alias{getRawExpDir}
 \title{Unpack and return path to raw NMR experiment directory}
 \usage{
-getRawExpDir(quiet = FALSE, reuntar = FALSE)
+getRawExpDir(quiet = FALSE, reuntar = FALSE, tar_override = NULL)
 }
 \arguments{
-\item{quiet}{Logical; suppress progress messages (default `FALSE`).}
+\item{quiet}{Logical; suppress progress messages (default \code{FALSE}).}
 
 \item{reuntar}{Logical; force re-extraction even if the directory already
-exists and is populated (default `FALSE`).}
+exists and is populated (default \code{FALSE}).}
+
+\item{tar_override}{Character path to a local \code{.tar.gz} file to use instead of
+ExperimentHub (for examples/tests; default \code{NULL}).}
 }
 \value{
 A character scalar: normalized absolute path to the unpacked dataset
-  directory inside the local ExperimentHub cache.
+directory inside the local ExperimentHub cache.
 }
 \description{
 Retrieves the raw NMR experiment archive (tar.gz) from ExperimentHub
@@ -26,16 +29,26 @@ replaced.
 \details{
 This helper is idempotent: repeated calls return the same normalized path
 without re-downloading or re-unpacking, unless explicitly instructed.
-
-
-- The function always uses the same internal ExperimentHub ID
-  (`EH9906` by default in this package).
-- The tarball is retrieved via [ExperimentHub::ExperimentHub()].
-- The directory is created next to the cached tarball inside the EH cache.
-- If the archive contains exactly one top-level folder, that name is reused.
-  Otherwise a default folder name (`"nmrdata"`) is created.
+\itemize{
+\item The function always uses the same internal ExperimentHub ID
+(\code{EH9906} by default in this package).
+\item The tarball is retrieved via \code{\link[ExperimentHub:ExperimentHub-class]{ExperimentHub::ExperimentHub()}}.
+\item The directory is created next to the cached tarball inside the EH cache.
+\item If the archive contains exactly one top-level folder, that name is reused.
+Otherwise a default folder name (\code{"nmrdata"}) is created.
+}
 }
 \examples{
+td <- tempfile(); dir.create(td)
+dir.create(file.path(td, "tinydata"))
+cat("ex data\n", file = file.path(td, "tinydata", "a.txt"))
+tarfile <- file.path(td, "tinydata.tar.gz")
+utils::tar(tarfile, files = "tinydata", compression = "gzip", tar = "internal")
+
+p <- getRawExpDir(tar_override = tarfile, quiet = TRUE)
+basename(p)              # "tinydata"
+list.files(p)            # "a.txt"
+
 \dontrun{
 exp_dir <- getRawExpDir()
 list.files(exp_dir, recursive = TRUE)[1:5]
@@ -46,5 +59,5 @@ exp_dir <- getRawExpDir(reuntar = TRUE)
 
 }
 \seealso{
-[ExperimentHub::ExperimentHub()], [utils::untar()]
+\code{\link[ExperimentHub:ExperimentHub-class]{ExperimentHub::ExperimentHub()}}, \code{\link[utils:untar]{utils::untar()}}
 }
